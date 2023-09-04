@@ -1,6 +1,6 @@
 terraform {
 
-backend "s3" {
+  backend "s3" {
     bucket = "be.seun.terraform"
     key    = "terraform/state"
     region = "us-east-1"
@@ -11,7 +11,9 @@ provider "aws" {
   region = var.region
 }
 
-data "aws_availability_zones" "available" {}
+data "aws_availability_zones" "available" {
+  state = "available"
+}
 
 locals {
   cluster_name = "instapro-eks-${random_string.suffix.result}"
@@ -120,4 +122,8 @@ resource "aws_eks_addon" "ebs-csi" {
 module "ecr" {
   source  = "terraform-aws-modules/ecr/aws//examples/complete"
   version = "1.6.0"
+}
+
+module "aws_ecs" {
+  source = "./modules/"
 }
