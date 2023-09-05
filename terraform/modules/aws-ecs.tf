@@ -135,6 +135,13 @@ resource "aws_lb_listener" "go_web_app" {
   }
 }
 
+resource "aws_ecr_repository" "go_web_app_repo" {
+  name = "go-web-app-repo"
+  tags = {
+    Name = "latest-go-app"
+  }
+}
+
 resource "aws_ecs_task_definition" "go_web_app" {
   family                   = "go-web-app"
   network_mode             = "awsvpc"
@@ -149,7 +156,7 @@ resource "aws_ecs_task_definition" "go_web_app" {
   container_definitions = <<DEFINITION
 [
   {
-    "image": "558855373261.dkr.ecr.us-east-1.amazonaws.com/ecr-ex-terraform:latest",
+    "image": "${aws_ecr_repository.go_web_app_repo.repository_url}",
     "cpu": 1024,
     "memory": 2048,
     "name": "go-web-app",

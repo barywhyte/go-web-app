@@ -118,11 +118,12 @@ resource "aws_eks_addon" "ebs-csi" {
   }
 }
 
-
+/*
 module "ecr" {
   source  = "terraform-aws-modules/ecr/aws//examples/complete"
   version = "1.6.0"
 }
+*/
 
 module "aws_ecs" {
   source = "./modules/"
