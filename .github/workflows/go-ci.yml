@@ -50,3 +50,4 @@ jobs:
         docker tag go-web-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.REGION }}.amazonaws.com/go-web-app-repo:latest
         docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.REGION }}.amazonaws.com/go-web-app-repo:latest
 
+
