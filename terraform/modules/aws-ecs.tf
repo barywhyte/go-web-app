@@ -192,7 +192,7 @@ resource "aws_security_group" "go_web_app_task" {
 }
 
 resource "aws_ecs_cluster" "main" {
-  name = "this-cluster"
+  name = "ecs-cluster"
 }
 
 resource "aws_ecs_service" "go_web_app" {

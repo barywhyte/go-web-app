@@ -6,6 +6,14 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: go-web-app-repo
+  ECS_SERVICE: go-web-app-service
+  ECS_CLUSTER: ecs-cluster
+  ECS_TASK_DEFINITION: task-definition.json # set this to the path to your Amazon ECS task definition # file, e.g. .aws/task-definition.json
+  CONTAINER_NAME: go-web-app
+
 jobs:
 
   build:
@@ -37,17 +45,32 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ secrets.REGION }}
+        aws-region: ${{ env.AWS_REGION }}
 
     - name: Log in to Amazon ECR
       id: login-ecr
       run: |
-         aws ecr get-login-password --region ${{ secrets.REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.REGION }}.amazonaws.com
+         aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
 
-    - name: Build and push Docker image
+    - name: Build, Tag and push Docker image
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker build -t go-web-app .
-        docker tag go-web-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.REGION }}.amazonaws.com/go-web-app-repo:latest
-        docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.REGION }}.amazonaws.com/go-web-app-repo:latest
+        echo $ECR_REGISTRY
+        echo $IMAGE_TAG
+        docker build -t $CONTAINER_NAME .
+        docker tag $CONTAINER_NAME:$IMAGE_TAG ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/$ECR_REPOSITORY:$IMAGE_TAG
+
+
+#  deploy:
+ #   name: Deploy
+  #  runs-on: ubuntu-latest
+   # environment: dev
+    #steps:
+    #- name: Checkout
+     # uses: actions/checkout@v2
 
 
