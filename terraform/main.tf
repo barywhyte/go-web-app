@@ -120,11 +120,6 @@ resource "aws_eks_addon" "ebs-csi" {
   }
 }
 
-/*
-module "ecr" {
-  source  = "terraform-aws-modules/ecr/aws//examples/complete"
-  version = "1.6.0"
-*/
 
   cidr = "10.0.0.0/16"
   azs  = slice(data.aws_availability_zones.available.names, 0, 3)
@@ -148,9 +143,6 @@ module "ecr" {
 }
 
 
-module "aws_ecs" {
-  source = "./modules/"
-  
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "19.15.3"
@@ -218,8 +210,6 @@ resource "aws_eks_addon" "ebs-csi" {
   }
 }
 
-
-module "ecr" {
-  source  = "terraform-aws-modules/ecr/aws//examples/complete"
-  version = "1.6.0"
+module "aws_ecs" {
+  source = "./modules/"
 }
