@@ -1,6 +1,7 @@
 terraform {
 
-backend "s3" {
+
+  backend "s3" {
     bucket = "be.seun.terraform"
     key    = "terraform/state"
     region = "us-east-1"
@@ -11,7 +12,14 @@ provider "aws" {
   region = var.region
 }
 
-data "aws_availability_zones" "available" {}
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
+# https://aws.amazon.com/blogs/containers/amazon-ebs-csi-driver-is-now-generally-available-in-amazon-eks-add-ons/
+data "aws_iam_policy" "ebs_csi_policy" {
+  arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+}
 
 locals {
   cluster_name = "instapro-eks-${random_string.suffix.result}"
@@ -89,11 +97,6 @@ module "eks" {
 }
 
 
-# https://aws.amazon.com/blogs/containers/amazon-ebs-csi-driver-is-now-generally-available-in-amazon-eks-add-ons/
-data "aws_iam_policy" "ebs_csi_policy" {
-  arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
-}
-
 module "irsa-ebs-csi" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
   version = "4.7.0"
@@ -117,7 +120,6 @@ resource "aws_eks_addon" "ebs-csi" {
 }
 
 
-module "ecr" {
-  source  = "terraform-aws-modules/ecr/aws//examples/complete"
-  version = "1.6.0"
+module "aws_ecs" {
+  source = "./modules/"
 }

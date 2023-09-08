@@ -20,9 +20,9 @@ func main() {
 		fmt.Println("-", tmpl.Name())
 	}
 
-	fmt.Println("Listening on port 80.")
+	fmt.Println("Listening on port 3000.")
 	router := http.NewServeMux()
 	router.HandleFunc("/", rootHandler)
-	http.ListenAndServe(":80", router)
+	http.ListenAndServe(":3000", router)
 
 }
